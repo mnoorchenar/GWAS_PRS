@@ -148,7 +148,7 @@ if uploaded_file is not None:
             - 📅 **Age:** {original_values["age"].values[0]}
             - {sex_icon}
             - ⚖️ **BMI:** {original_values["BMI"].values[0]}
-            - 🚶 **Physical Activity:** {original_values["Physicalactivity"].values[0]}
+            - 🚶 **Physical Activity:** {original_values["PhysicalActivity"].values[0]}
             - 🍗 **Protein Intake:** {original_values["ProteinDay"].values[0]}
             - 🚬 **Current Smoker:** {"✅ Yes" if original_values["CurrentSmoking"].values[0] == 1 else "❌ No"}
             - 🍔 **High Fat Mass:** {"✅ Yes" if original_values["HighFatMass"].values[0] == 1 else "❌ No"}
