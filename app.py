@@ -68,11 +68,30 @@ st.markdown("""
 # ----------------------------
 # FILE UPLOAD SECTION
 # ----------------------------
+# Default dataset URL
+DEFAULT_DATASET_URL = "https://raw.githubusercontent.com/mnoorchenar/GWAS_PRS/main/simulated_sarcopenia_data.csv"
+
 st.title("🧬 GWAS Polygenic Risk Score (PRS) Application")
 
+# Add information about the dataset
+st.markdown("""
+### 📥 Default Dataset  
+By default, the application loads a pre-existing dataset.  
+If you want to use your own, upload a CSV file below. Otherwise, the default dataset will be used.  
+➡️ [View Default Dataset](https://github.com/mnoorchenar/GWAS_PRS/blob/main/simulated_sarcopenia_data.csv)
+""")
+
+# File uploader
 uploaded_file = st.file_uploader("📂 Upload your SNP dataset (CSV)", type=["csv"])
+
+# Load dataset: Use uploaded file if available, otherwise use default dataset
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
+    st.success("✅ Custom dataset uploaded successfully!")
+else:
+    df = pd.read_csv(DEFAULT_DATASET_URL)
+    st.info("ℹ️ Using the default dataset.")
+
     df = df.dropna()  # Remove any missing values from the entire dataset
 
     if "df_original" not in st.session_state:
