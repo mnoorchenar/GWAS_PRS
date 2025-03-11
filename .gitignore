@@ -1,4 +1,4 @@
-# Ignore Python bytecode and cache files
+# Ignore Python cache
 __pycache__/
 *.pyc
 *.pyo
@@ -6,19 +6,7 @@ __pycache__/
 
 # Ignore virtual environments
 venv/
-env/
-*.venv
+.env/
 
-# Ignore Streamlit logs and cache
-.streamlit/
-logs/
-
-# Ignore Jupyter Notebook checkpoints (if applicable)
-.ipynb_checkpoints/
-
-# Ignore system files (Mac & Windows)
+# Ignore system-specific files
 .DS_Store
-Thumbs.db
-
-# Ignore environment variables and credentials (if any)
-.env
