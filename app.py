@@ -151,7 +151,6 @@ if uploaded_file is not None:
             - 🚶 **Physical Activity:** {original_values["Physicalactivity"].values[0]}
             - 🍗 **Protein Intake:** {original_values["ProteinDay"].values[0]}
             - 🚬 **Current Smoker:** {"✅ Yes" if original_values["CurrentSmoking"].values[0] == 1 else "❌ No"}
-            - 🍔 **High Fat Mass:** {"✅ Yes" if original_values["HighFatMass"].values[0] == 1 else "❌ No"}
             """)
         with col2:
             st.write("### 🔬 SNP Effect Sizes")
