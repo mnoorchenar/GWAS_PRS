@@ -1,0 +1,24 @@
+# Ignore Python bytecode and cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+env/
+*.venv
+
+# Ignore Streamlit logs and cache
+.streamlit/
+logs/
+
+# Ignore Jupyter Notebook checkpoints (if applicable)
+.ipynb_checkpoints/
+
+# Ignore system files (Mac & Windows)
+.DS_Store
+Thumbs.db
+
+# Ignore environment variables and credentials (if any)
+.env
