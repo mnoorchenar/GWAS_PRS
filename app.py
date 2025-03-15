@@ -8,6 +8,74 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
+# ----------------------------
+# FUNCTION TO GENERATE SYNTHETIC DATA
+# ----------------------------
+def generate_synthetic_data(n_samples, snp_effects, demo_effects, noise_level, disease_ratio):
+    np.random.seed(42)
+
+    # Generate demographic features
+    age = np.random.randint(50, 90, size=n_samples)
+    sex = np.random.choice([0, 1], size=n_samples)  # 1 = Male, 0 = Female
+    BMI = np.random.uniform(15, 40, size=n_samples)
+    PhysicalActivity = np.random.randint(0, 11, size=n_samples)
+    ProteinDay = np.random.uniform(50, 150, size=n_samples)
+    CurrentSmoking = np.random.choice([0, 1], size=n_samples)
+    HighFatMass = np.random.choice([0, 1], size=n_samples)
+
+    # Generate SNPs with specified frequencies
+    snp_columns = ["rs10001", "rs10002", "rs10003"]
+    snp_data = np.random.choice([0, 1, 2], size=(n_samples, len(snp_columns)), p=[0.6, 0.3, 0.1])
+
+    # Create a DataFrame
+    data = pd.DataFrame({
+        "age": age,
+        "sex": sex,
+        "BMI": BMI,
+        "PhysicalActivity": PhysicalActivity,
+        "ProteinDay": ProteinDay,
+        "CurrentSmoking": CurrentSmoking,
+        "HighFatMass": HighFatMass
+    })
+
+    # Add SNPs to the DataFrame
+    snp_df = pd.DataFrame(snp_data, columns=snp_columns)
+    data = pd.concat([data, snp_df], axis=1)
+
+    # Calculate the probability of sarcopenia using logistic regression equation
+    base_probability = 0.5  # Default base probability
+
+    # Calculate risk score using user-defined effects
+    risk_score = (
+        snp_effects[0] * data["rs10001"] +
+        snp_effects[1] * data["rs10002"] +
+        snp_effects[2] * data["rs10003"] +
+        demo_effects[0] * data["age"] +
+        demo_effects[1] * data["sex"] +
+        demo_effects[2] * data["BMI"] +
+        demo_effects[3] * data["PhysicalActivity"] +
+        demo_effects[4] * data["ProteinDay"] +
+        demo_effects[5] * data["CurrentSmoking"] +
+        demo_effects[6] * data["HighFatMass"]
+    )
+
+    # Add noise
+    noise = np.random.normal(0, noise_level, n_samples)
+    risk_score += noise
+
+    # Convert risk score to probability using sigmoid function
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+    probability = sigmoid(base_probability + risk_score)
+
+    # Convert probability to binary outcome based on user-defined disease ratio
+    disease_threshold = np.percentile(probability, 100 - disease_ratio)
+    data["sarcopenia"] = (probability > disease_threshold).astype(int)
+
+    return data
+
+
 # Inject custom CSS for global styling and slider layout
 st.markdown("""
     <style>
@@ -66,129 +134,119 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ----------------------------
-# FILE UPLOAD SECTION
+# SAMPLE GENERATION SECTION
 # ----------------------------
-# Default dataset URL
-DEFAULT_DATASET_URL = "https://raw.githubusercontent.com/mnoorchenar/GWAS_PRS/main/simulated_sarcopenia_data.csv"
-
 st.title("🧬 GWAS Polygenic Risk Score (PRS) Application")
 
-# Add information about the dataset
-st.markdown("""
-### 📥 Default Dataset  
-By default, the application loads a pre-existing dataset.  
-If you want to use your own, upload a CSV file below. Otherwise, the default dataset will be used.  
-➡️ [View Default Dataset](https://github.com/mnoorchenar/GWAS_PRS/blob/main/simulated_sarcopenia_data.csv)
-""")
+st.markdown("### 🔬 Generate Synthetic SNP & Demographic Data")
 
-# File uploader
-uploaded_file = st.file_uploader("📂 Upload your SNP dataset (CSV)", type=["csv"])
+# Compact layout for sample size, noise level, and disease percentage
+cols = st.columns(3)
 
-# Load dataset: Use uploaded file if available, otherwise use default dataset
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    st.success("✅ Custom dataset uploaded successfully!")
-else:
-    df = pd.read_csv(DEFAULT_DATASET_URL)
-    st.info("ℹ️ Using the default dataset.")
+n_samples = cols[0].slider("📊 Number of Samples", min_value=100, max_value=2000, value=500, step=50)
+noise_level = cols[1].slider("🔊 Noise Level", 0.0, 2.0, 0.5, 0.1)
+disease_ratio = cols[2].slider("🩺 % Diseased Patients", 0, 100, 50, 5)  # Default is 50% disease
 
-    df = df.dropna()  # Remove any missing values from the entire dataset
+# User-defined effect sizes for SNPs
+st.markdown("#### 🧪 SNP Effect Sizes")
+col1, col2, col3 = st.columns(3)
+snp_effects = [
+    col1.slider("rs10001 Effect", -2.0, 2.0, 0.5, 0.1),
+    col2.slider("rs10002 Effect", -2.0, 2.0, 0.3, 0.1),
+    col3.slider("rs10003 Effect", -2.0, 2.0, 0.7, 0.1)
+]
 
-    if "df_original" not in st.session_state:
-        st.session_state.df_original = df.copy()
+# User-defined effect sizes for demographic features
+st.markdown("#### 🏥 Demographic Feature Effect Sizes")
+cols = st.columns(4)  # Creates 4 compact columns
+demo_effects = [
+    cols[0].slider("Age", -0.05, 0.05, 0.01, 0.01),
+    cols[1].slider("Sex", -1.0, 1.0, 0.2, 0.1),
+    cols[2].slider("BMI", -0.1, 0.1, 0.02, 0.01),
+    cols[3].slider("Physical Activity", -0.1, 0.1, -0.03, 0.01),
+]
 
-    st.write("### 🔍 Preview of Uploaded Data:")
+cols = st.columns(3)
+demo_effects += [
+    cols[0].slider("Protein Intake", -0.1, 0.1, 0.01, 0.01),
+    cols[1].slider("Smoking", -1.0, 1.0, -0.5, 0.1),
+    cols[2].slider("High Fat Mass", -1.0, 1.0, 0.6, 0.1)
+]
+
+
+# Generate synthetic data when user clicks
+if st.button("🔄 Generate Data"):
+    df = generate_synthetic_data(n_samples, snp_effects, demo_effects, noise_level, disease_ratio)
+    st.session_state.df_original = df.copy()
+
+    st.write("### 🔍 Preview of Generated Data:")
     st.dataframe(df.head())
 
-    target_variable = st.selectbox("🎯 Select Target Variable", df.columns)
-    st.markdown("<br>", unsafe_allow_html=True)
-    selected_snp_columns = st.multiselect("🧪 Select SNPs", df.columns)
-    demographic_features = st.multiselect("🏥 Include Demographic Features", df.columns)
+    # Define features and target
+    target_variable = "sarcopenia"
+    selected_snp_columns = ["rs10001", "rs10002", "rs10003"]
+    demographic_features = ["age", "sex", "BMI", "PhysicalActivity", "ProteinDay", "CurrentSmoking", "HighFatMass"]
+    model_features = selected_snp_columns + demographic_features
+    st.session_state.model_features = model_features
 
-    if selected_snp_columns and target_variable:
-        # Create model features and store them in session state
-        model_features = selected_snp_columns + demographic_features
-        st.session_state.model_features = model_features
+    # Train/Test split
+    X = df[model_features]
+    y = df[target_variable]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # beta_values = np.random.uniform(-1, 1, len(selected_snp_columns))
+    # Store in session state
+    st.session_state.X = X
+    st.session_state.y = y
+    st.session_state.X_train = X_train
+    st.session_state.X_test = X_test
+    st.session_state.y_train = y_train
+    st.session_state.y_test = y_test
 
-        # Calculate beta values via logistic regression for each SNP
-        beta_values = []
-        for snp in selected_snp_columns:
-            # Build a temporary feature matrix including the SNP and all demographic covariates
-            # If no demographic features are selected, we use only the SNP.
-            if demographic_features:
-                X_temp = df[[snp] + demographic_features]
-            else:
-                X_temp = df[[snp]]
+    # Train a default model for preview
+    default_model = DecisionTreeClassifier(max_depth=3)
+    default_model.fit(X_train, y_train)
+    st.session_state.model = default_model
 
-            # Initialize and fit logistic regression model
-            lr_model = LogisticRegression(max_iter=1000)
-            lr_model.fit(X_temp, df[target_variable])
+    # Select Patient for Display
+    selected_index = st.selectbox("🧑‍⚕️ Select a Patient", df.index)
+    st.session_state.selected_index = selected_index
 
-            # Extract the coefficient for the SNP. Here, we assume the SNP is the first column.
-            beta = lr_model.coef_[0][0]
-            beta_values.append(beta)
-
-        beta_values = np.array(beta_values)
-
-        df["PRS"] = np.dot(df[selected_snp_columns], beta_values)
-
-        X = df[model_features]
-        y = df[target_variable]
-
-        # Store dataset and splits in session state
-        st.session_state.X = X
-        st.session_state.y = y
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        st.session_state.X_train = X_train
-        st.session_state.X_test = X_test
-        st.session_state.y_train = y_train
-        st.session_state.y_test = y_test
-
-        # Train a default model for preview (optional)
-        default_model = DecisionTreeClassifier(max_depth=3)
-        default_model.fit(X_train, y_train)
-        st.session_state.model = default_model
-
-        # Select Patient for Display
-        selected_index = st.selectbox("🧑‍⚕️ Select a Patient", df.index)
-        st.session_state.selected_index = selected_index
-
-        # ----------------------------
-        # DISPLAY PATIENT RESULTS
-        # ----------------------------
-        col1, col2 = st.columns([1.3, 1])
-        with col1:
-            st.write("### 🏥 Patient Demographics")
-            original_values = st.session_state.df_original.iloc[selected_index:selected_index + 1]
-            sex_icon = "♂️ Male" if original_values["sex"].values[0] == 1 else "♀️ Female"
-            st.markdown(f"""
-            - 📅 **Age:** {original_values["age"].values[0]}
-            - {sex_icon}
-            - ⚖️ **BMI:** {original_values["BMI"].values[0]}
-            - 🚶 **Physical Activity:** {original_values["PhysicalActivity"].values[0]}
-            - 🍗 **Protein Intake:** {original_values["ProteinDay"].values[0]}
-            - 🚬 **Current Smoker:** {"✅ Yes" if original_values["CurrentSmoking"].values[0] == 1 else "❌ No"}
-            - 🍔 **High Fat Mass:** {"✅ Yes" if original_values["HighFatMass"].values[0] == 1 else "❌ No"}
-            """)
-        with col2:
-            st.write("### 🔬 SNP Effect Sizes")
-            fig, ax = plt.subplots(figsize=(4, 3))
-            ax.barh(selected_snp_columns, beta_values, color="blue")
-            ax.set_xlabel("Effect Size (β)")
-            ax.set_ylabel("SNPs")
-            ax.set_title("SNP Effect Sizes")
-            st.pyplot(fig)
-
-# Display the Polygenic Risk Score Box
-        polygenic_score = df.loc[selected_index, 'PRS']
-        box_color = "rgba(255, 0, 0, 0.2)" if polygenic_score > 0 else "rgba(0, 255, 0, 0.2)"
+    # ----------------------------
+    # DISPLAY PATIENT RESULTS
+    # ----------------------------
+    col1, col2 = st.columns([1.3, 1])
+    with col1:
+        st.write("### 🏥 Patient Demographics")
+        original_values = st.session_state.df_original.iloc[selected_index:selected_index + 1]
+        sex_icon = "♂️ Male" if original_values["sex"].values[0] == 1 else "♀️ Female"
         st.markdown(f"""
-        <div style="background-color: {box_color}; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px;">
-             🧬 Polygenic Risk Score (PRS) : <strong>{polygenic_score:.3f}</strong>
-        </div>
-        """, unsafe_allow_html=True)
+        - 📅 **Age:** {original_values["age"].values[0]}
+        - {sex_icon}
+        - ⚖️ **BMI:** {original_values["BMI"].values[0]}
+        - 🚶 **Physical Activity:** {original_values["PhysicalActivity"].values[0]}
+        - 🍗 **Protein Intake:** {original_values["ProteinDay"].values[0]}
+        - 🚬 **Current Smoker:** {"✅ Yes" if original_values["CurrentSmoking"].values[0] == 1 else "❌ No"}
+        - 🍔 **High Fat Mass:** {"✅ Yes" if original_values["HighFatMass"].values[0] == 1 else "❌ No"}
+        """)
+
+    with col2:
+        st.write("### 🔬 SNP Effect Sizes")
+        fig, ax = plt.subplots(figsize=(4, 3))
+        ax.barh(selected_snp_columns, snp_effects, color="blue")
+        ax.set_xlabel("Effect Size (β)")
+        ax.set_ylabel("SNPs")
+        ax.set_title("SNP Effect Sizes")
+        st.pyplot(fig)
+
+    # Display the Polygenic Risk Score Box
+    polygenic_score = df.loc[selected_index, 'sarcopenia']
+    box_color = "rgba(255, 0, 0, 0.2)" if polygenic_score > 0 else "rgba(0, 255, 0, 0.2)"
+    st.markdown(f"""
+    <div style="background-color: {box_color}; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px;">
+         🧬 Polygenic Risk Score (PRS) : <strong>{polygenic_score:.3f}</strong>
+    </div>
+    """, unsafe_allow_html=True)
+
 # ----------------------------
 # TRAINING MODEL SECTION (Labels & Sliders with Fixed Padding)
 # This section only runs after the user clicks "Train Model"
@@ -256,6 +314,9 @@ with st.expander("🔽 Click to expand/collapse model settings & training result
             st.write("Train your model to see the results.")
     st.markdown('</div>', unsafe_allow_html=True)
 
+
+
+
 if "model" in st.session_state and "X" in st.session_state and "selected_index" in st.session_state:
     st.write("### 🔍 SHAP Waterfall Plot for Selected Patient")
     instance = st.session_state.X.iloc[[st.session_state.selected_index]]
@@ -281,7 +342,7 @@ if "model" in st.session_state and "X" in st.session_state and "selected_index" 
         )
 
     # Explicitly create a new figure to prevent overlapping plots
-    plt.figure()
+    plt.figure(figsize=(3, 2))  # Adjust these values to make it smaller or larger
     shap.plots.waterfall(shap_values_single, show=False)
     fig_waterfall = plt.gcf()
     st.pyplot(fig_waterfall)
