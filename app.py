@@ -85,12 +85,12 @@ st.markdown("""
         margin: 10px;
     }
     /* Heading styles */
-    h1 { font-size: 1.75em; margin-bottom: 0.5em; }
-    h2 { font-size: 1.5em; margin-bottom: 0.25em; }
-    h3 { font-size: 1.25em; margin-bottom: 0.15em; }
-    h4 { font-size: 1.1em; margin-bottom: 0.15em; }
-    h5 { font-size: 1em; margin-bottom: 0.15em; }
-    h6 { font-size: 0.9em; margin-bottom: 0.5em; }
+    h1 { font-size: 1.5em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.25em; margin-bottom: 0.25em; }
+    h3 { font-size: 1.1em; margin-bottom: 0.15em; }
+    h4 { font-size: 1em; margin-bottom: 0.15em; }
+    h5 { font-size: 0.9em; margin-bottom: 0.15em; }
+    h6 { font-size: 0.8em; margin-bottom: 0.5em; }
     p { margin: 0.5em 0; }
 
     /* Expander Styling */
