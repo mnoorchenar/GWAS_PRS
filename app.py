@@ -78,59 +78,60 @@ def generate_synthetic_data(n_samples, snp_effects, demo_effects, noise_level, d
 
 # Inject custom CSS for global styling and slider layout
 st.markdown("""
-    <style>
-    /* Global body styling */
-    body {
-        font-family: 'Arial', sans-serif;
-        margin: 10px;
-    }
-    /* Heading styles */
-    h1 { font-size: 1.5em; margin-bottom: 0.5em; }
-    h2 { font-size: 1.25em; margin-bottom: 0.25em; }
-    h3 { font-size: 1.1em; margin-bottom: 0.15em; }
-    h4 { font-size: 1em; margin-bottom: 0.15em; }
-    h5 { font-size: 0.9em; margin-bottom: 0.15em; }
-    h6 { font-size: 0.8em; margin-bottom: 0.5em; }
-    p { margin: 0.5em 0; }
+<style>
+/* Target the main app container */
+div.stApp {
+    font-family: 'Arial', sans-serif;
+    margin: 10px;
+}
 
-    /* Expander Styling */
-    .st-expander {
-        background-color: #d9d9d9 !important;
-        color: black !important;
-        border-radius: 8px;
-        padding: 10px;
-    }
-    .expander-content {
-        max-height: 70vh;  
-        overflow-y: auto;  
-        background-color: #f5f5f5 !important;
-        padding: 12px;
-        border-radius: 10px;
-    }
+/* Headings within markdown or Streamlit components */
+h1, div[data-testid="stMarkdownContainer"] h1 {
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+}
+h2, div[data-testid="stMarkdownContainer"] h2 {
+    font-size: 1.25em;
+    margin-bottom: 0.25em;
+}
 
-    /* Table-like layout for slider rows */
-    .slider-row {
-        display: table;
-        width: 100%;
-        margin-bottom: 4px;
-    }
-    .slider-label {
-        display: table-cell;
-        font-size: 14px !important;
-        font-weight: bold;
-        width: 160px;  /* Adjust width as needed */
-        padding-right: 15px;  /* Padding between label and slider */
-        white-space: nowrap;
-    }
-    .slider-cell {
-        display: table-cell;
-        width: 100%;
-    }
-    /* Ensure slider widget takes full width of its container */
-    div[data-testid="stSlider"] {
-        width: 100% !important;
-    }
-    </style>
+/* Expander styling */
+div[data-testid="stExpander"] {
+    background-color: #d9d9d9 !important;
+    color: black !important;
+    border-radius: 8px;
+    padding: 10px;
+}
+.expander-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: #f5f5f5 !important;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+/* Slider layout using Flexbox */
+.slider-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+}
+.slider-label {
+    font-size: 14px !important;
+    font-weight: bold;
+    width: 160px;
+    padding-right: 15px;
+    white-space: nowrap;
+}
+.slider-cell {
+    flex-grow: 1;
+}
+div[data-testid="stSlider"] {
+    width: 100% !important;
+    max-width: 100%;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # ----------------------------
