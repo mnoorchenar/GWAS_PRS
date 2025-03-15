@@ -91,8 +91,16 @@ h1, div[data-testid="stMarkdownContainer"] h1 {
     margin-bottom: 0.5em;
 }
 h2, div[data-testid="stMarkdownContainer"] h2 {
-    font-size: 1.25em;
+    font-size: 1.3em;
     margin-bottom: 0.25em;
+}
+h3, div[data-testid="stMarkdownContainer"] h3 {
+    font-size: 1.15em;
+    margin-bottom: 0.2em;
+}
+p, div[data-testid="stMarkdownContainer"] p {
+    font-size: 0.9em;
+    margin-bottom: 0.2em;
 }
 
 /* Expander styling */
