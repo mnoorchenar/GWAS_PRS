@@ -98,10 +98,15 @@ h3, div[data-testid="stMarkdownContainer"] h3 {
     font-size: 1.15em;
     margin-bottom: 0.2em;
 }
-h3, div[data-testid="stMarkdownContainer"] h3 {
+h4, div[data-testid="stMarkdownContainer"] h4 {
     font-size: 1.1em;
     margin-bottom: 0.2em;
 }
+h5, div[data-testid="stMarkdownContainer"] h5 {
+    font-size: 1.1em;
+    margin-bottom: 0.2em;
+}
+
 p, div[data-testid="stMarkdownContainer"] p {
     font-size: 0.9em;
     margin-bottom: 0.2em;
