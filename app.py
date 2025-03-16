@@ -461,7 +461,7 @@ if "model" in st.session_state and "X" in st.session_state and "selected_index" 
     top_explanations = []
     for feat, val in zip(top_features, top_values):
         prob_change = float(sigmoid(base_values + val) - baseline_prob)  # Convert to float
-        color = "#FF0000" if prob_change > 0 else "#0000FF"
+        color = "#FF0000" if prob_change > 0 else "#1E90FF"  # Dodger Blue (Good Contrast)
         direction = "increases" if prob_change > 0 else "decreases"
         top_explanations.append(
             f"<span style='color:{color};'><b>{feat}</b> changes probability by {prob_change:+.2%}.</span>"
@@ -486,72 +486,3 @@ if "model" in st.session_state and "X" in st.session_state and "selected_index" 
             "<br> Most influential factors: " + ", ".join(top_explanations) + ".",
             unsafe_allow_html=True
         )
-
-
-#
-# if "model" in st.session_state and "X" in st.session_state and "selected_index" in st.session_state:
-#     st.write("### 🔍 SHAP Waterfall Plot for Selected Patient")
-#
-#     instance = st.session_state.X.iloc[[st.session_state.selected_index]]
-#
-#     # Compute SHAP values
-#     explainer = shap.TreeExplainer(st.session_state.model)
-#     shap_values = explainer(instance)
-#
-#     # Handle classification models with multiple classes
-#     if len(shap_values.values.shape) > 1:
-#         class_index = 1 if shap_values.values.shape[-1] > 1 else 0
-#         shap_values_single = shap.Explanation(
-#             values=shap_values.values[..., class_index].flatten(),
-#             base_values=shap_values.base_values[..., class_index].flatten(),
-#             data=shap_values.data.flatten(),
-#             feature_names=shap_values.feature_names
-#         )
-#     else:
-#         shap_values_single = shap.Explanation(
-#             values=shap_values.values.flatten(),
-#             base_values=shap_values.base_values.flatten(),
-#             data=shap_values.data.flatten(),
-#             feature_names=shap_values.feature_names
-#         )
-#
-#     # Compute top 3 important features based on absolute SHAP values
-#     shap_vals = np.array(shap_values_single.values)
-#     abs_shap_vals = np.abs(shap_vals)
-#     top_indices = np.argsort(abs_shap_vals)[-3:][::-1]
-#     top_features = [shap_values_single.feature_names[i] for i in top_indices]
-#     top_values = [shap_values_single.values[i] for i in top_indices]
-#
-#
-#     # Convert log-odds contributions to probability change
-#     def sigmoid(x):
-#         return 1 / (1 + np.exp(-x))
-#
-#
-#     top_explanations = []
-#     for feat, val in zip(top_features, top_values):
-#         delta_prob = sigmoid(val) - 0.50
-#         color = "#FF0000" if val > 0 else "#0000FF"
-#         direction = "increases" if val > 0 else "decreases"
-#         top_explanations.append(
-#             f"<span style='color:{color};'><b>{feat}</b> ({val:+.2f}) {direction} the prediction.</span>"
-#         )
-#
-#     # Display results in two columns: 2/3 for the plot, 1/3 for explanation
-#     col1, col2 = st.columns([2, 1])
-#
-#     with col1:
-#         # Explicitly create and close the SHAP waterfall plot
-#         plt.figure()
-#         shap.plots.waterfall(shap_values_single, show=False)
-#         fig_waterfall = plt.gcf()
-#         st.pyplot(fig_waterfall)
-#         plt.close(fig_waterfall)
-#
-#     with col2:
-#         st.markdown("### Explanation")
-#         st.markdown(
-#             "🔴 **Red** features increase the prediction probability, while 🔵 **blue** features decrease it."
-#             "<br><br> Most influential factors: " + ", ".join(top_explanations) + ".",
-#             unsafe_allow_html=True
-#         )
