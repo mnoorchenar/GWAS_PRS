@@ -41,7 +41,19 @@ Customize your dataset by adjusting:
 
 ---
 
-### 2. Train a Prediction Model
+### 2. Explore Patient Profiles
+Pick a patient from the dataset and explore:
+- Personal demographics
+- SNP effect sizes
+- Polygenic Risk Score (PRS)
+
+Understand the patient's risk through intuitive visual explanations and SHAP waterfall plots.
+
+![9882FE40-E483-47F9-851D-6B8D657FE9A9](https://github.com/user-attachments/assets/0148c9e0-2fe8-40f2-816f-3746e9664af4)
+
+---
+
+### 3. Train a Prediction Model
 Select a machine learning model and tune its settings:
 - Random Forest
 - Gradient Boosting
@@ -51,21 +63,30 @@ After training, you'll immediately see:
 - Model accuracy
 - Feature importance scores
 
-**(Screenshot Recommended Here: Model Training Section)**
+![1F765BBD-14EB-42F3-8BC9-C12E9E19BB0B](https://github.com/user-attachments/assets/756e3cd8-7721-4258-b1f0-5190a42d2cec)
 
 ---
 
-### 3. Explore Patient Profiles
-Pick a patient from the dataset and explore:
-- Personal demographics
-- SNP effect sizes
-- Polygenic Risk Score (PRS)
+### 4. Interpret Risk with SHAP Waterfall Plot 📈📉
 
-Understand the patient's risk through intuitive visual explanations and SHAP waterfall plots.
+After selecting a patient, the app provides a **SHAP Waterfall Plot** to explain the model's risk prediction in an intuitive way.
 
-**(Screenshot Recommended Here: Patient Profile Section & SHAP Explanation)**
+🔍 **What it shows:**
+- The model calculates risk using **log-odds (logits)**, but what matters most is the final **predicted probability of disease**.
+- The plot visualizes how each feature **pushes** the risk **higher (red)** or **lower (blue)** compared to the baseline.
 
----
+🧪 **Example Interpretation:**
+- This patient's estimated risk is **66.1%**, starting from an average population risk of **67.8%**.
+- 🔴 Features in **red** (like "Current Smoking") increase the risk.
+- 🔵 Features in **blue** (like "Age" and "BMI") decrease the risk.
+- **Most influential factors**:
+  - `age` changes probability by **-0.60%**
+  - `BMI` changes probability by **-0.40%**
+  - `CurrentSmoking` changes probability by **-0.35%**
+
+This makes it easy to understand which factors are driving each individual's risk prediction.
+
+![1CBA4639-6EFF-47F2-A22E-1D2BE6937CC0](https://github.com/user-attachments/assets/328dabda-6fa0-4b14-b41f-4a70cc8c2f18)
 
 ## Why Use This App? 🎯
 
