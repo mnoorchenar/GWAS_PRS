@@ -37,7 +37,7 @@ Customize your dataset by adjusting:
 - % of diseased patients
 - Effect sizes for SNPs and lifestyle factors
 
-**(Screenshot Recommended Here: Data Generation Section)**
+![20845D08-266E-4683-965C-580C87A9BF85](https://github.com/user-attachments/assets/95c8f271-605b-4c55-9d9c-e6e3beaa0df6)
 
 ---
 
